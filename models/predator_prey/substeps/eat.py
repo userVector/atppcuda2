@@ -89,12 +89,12 @@ class EatGrass(SubstepTransition):
     # energy + nutrition adds the `nutrition` tensor to all elements in
     # the energy tensor. the (~energy_mask) ensures that the change is
     # undone for those prey that did not consume grass.
-    energy = energy_mask*(energy + nutrition) + (~energy_mask)*energy
+    energy = energy_mask.to('cuda')*(energy.to('cuda') + nutrition.to('cuda')) + (~energy_mask.to('cuda'))*energy.to('cuda')
 
     # these masks use simple addition to make changes to the original
     # values of the tensors.
-    grass_growth = grass_growth + grass_mask
-    growth_countdown = growth_countdown + countdown_mask
+    grass_growth = grass_growth.to('cuda') + grass_mask.to('cuda')
+    growth_countdown = growth_countdown.to('cuda') + countdown_mask.to('cuda')
 
     return {
       self.output_variables[0]: energy,

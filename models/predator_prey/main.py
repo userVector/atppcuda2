@@ -25,6 +25,9 @@ from helpers import *
 
 from plot import Plot
 
+import torch.optim as optim
+import torch.nn.functional as F
+
 print(':: execution started')
 
 parser = argparse.ArgumentParser()
@@ -47,9 +50,32 @@ runner.init()
 
 print(':: preparing simulation...')
 
-visual = Plot(metadata.get('max_x'), metadata.get('max_y'))
+#for name, param in runner.named_parameters():
+#    if param.requires_grad:
+#        print(f"Parameter '{name}' requires gradient and will be optimized.")
+
+optimizer = optim.Adam(runner.parameters(), 
+                lr=runner.config['simulation_metadata']['learning_params']['lr'], 
+                betas=runner.config['simulation_metadata']['learning_params']['betas'])
+scheduler = optim.lr_scheduler.ExponentialLR(optimizer, 
+                runner.config['simulation_metadata']['learning_params']['lr_gamma'])
+
+#visual = Plot(metadata.get('max_x'), metadata.get('max_y'))
 for episode in trange(num_episodes, desc=':: running simulation'):
+  #optimizer.zero_grad()
   runner.step(num_steps_per_episode)
-  visual.capture(runner.state)
+  #visual.capture(runner.state)
+  output = runner.state_trajectory[-1][-1]
+  #x = output['agents']['prey']['nutritional_value'].to(metadata.get('device')) #['energy'] #
+  #x = torch.tensor(output['agents']['prey']['nutritional_value'], requires_grad=True).to(metadata.get('device'))
+  x = output['agents']['prey']['nutritional_value'].clone().detach().requires_grad_(True).to(metadata.get('device'))
+  #print(x.shape)
+  #print(x)
+  #target = torch.from_numpy(np.full((x.shape), 32).astype(np.float32), requires_grad=True).to(metadata.get('device'))
+  target = torch.full((x.shape), 32.0).to(metadata.get('device')) #, requires_grad=True
+  loss = F.mse_loss(x, target)
+  loss.backward()
+  optimizer.step()
+  scheduler.step()
 
 print(':: execution completed')

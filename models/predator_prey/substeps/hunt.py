@@ -74,9 +74,9 @@ class HuntPrey(SubstepTransition):
         pred_energy_mask = pred_energy_mask + pde_m
 
     # any prey that is marked for death should be given zero energy.
-    prey_energy = prey_energy_mask*0 + (~prey_energy_mask)*prey_energy
+    prey_energy = prey_energy_mask.to('cuda')*torch.tensor([0]).to('cuda') + (~prey_energy_mask.to('cuda'))*prey_energy.to('cuda')
     # any predator that has hunted should be given additional energy.
-    pred_energy = pred_energy_mask*(pred_energy + nutrition) + (~pred_energy_mask)*pred_energy
+    pred_energy = pred_energy_mask.to('cuda')*(pred_energy.to('cuda') + nutrition.to('cuda')) + (~pred_energy_mask.to('cuda'))*pred_energy.to('cuda')
 
     return {
       self.output_variables[0]: prey_energy,

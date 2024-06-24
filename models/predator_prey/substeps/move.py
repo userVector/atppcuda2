@@ -100,15 +100,15 @@ class UpdatePositions(SubstepTransition):
   def forward(self, state, action):
     input_variables = self.input_variables
 
-    prey_energy = get_var(state, input_variables['prey_energy'])
-    pred_energy = get_var(state, input_variables['pred_energy'])
-    prey_work = get_var(state, input_variables['prey_work'])
-    pred_work = get_var(state, input_variables['pred_work'])
+    prey_energy = get_var(state, input_variables['prey_energy']).to('cuda')
+    pred_energy = get_var(state, input_variables['pred_energy']).to('cuda')
+    prey_work = get_var(state, input_variables['prey_work']).to('cuda')
+    pred_work = get_var(state, input_variables['pred_work']).to('cuda')
 
     # reduce the energy of the agent by the work required by them
     # to take one step.
-    prey_energy = prey_energy + torch.full(prey_energy.shape, -1 * (prey_work.item()))
-    pred_energy = pred_energy + torch.full(pred_energy.shape, -1 * (pred_work.item()))
+    prey_energy = prey_energy + torch.full(prey_energy.shape, -1 * (prey_work.item())).to('cuda')
+    pred_energy = pred_energy + torch.full(pred_energy.shape, -1 * (pred_work.item())).to('cuda')
     
     return {
       self.output_variables[0]: action['prey']['next_positions'],

@@ -2,11 +2,11 @@
 # configuration for the predator-prey model.
 
 simulation_metadata:
-  device: 'cpu'
+  device: 'cuda'
   num_episodes: 50
   num_steps_per_episode: 1
   num_substeps_per_step: 4
-  calibration: false
+  calibration: True
   visualize: false
 
   max_x: 18
@@ -20,6 +20,13 @@ simulation_metadata:
   grass_coords_file: 'data/18x25/grass-coords.csv'
   grass_growth_stage_file: 'data/18x25/growth-stage.csv'
   grass_growth_countdown_file: 'data/18x25/growth-countdown.csv'
+
+  learning_params:
+        lr: 2e-3
+        betas:
+            - 0.5
+            - 0.5
+        lr_gamma:  0.9999
 
 state:
   environment:

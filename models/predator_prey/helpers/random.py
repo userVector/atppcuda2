@@ -19,9 +19,9 @@ def random_float(shape, params):
   # floating point numbers in the range (0, 1]. multiplying the
   # tensor by max - min and adding the min value ensure it's
   # within the given range.
-  tens = (max - min) * torch.rand(shape) + min
+  tens = (max.to('cuda') - min.to('cuda')) * torch.rand(shape).to('cuda') + min.to('cuda')
 
-  return tens
+  return tens #.to('cuda')
 
 @Registry.register_helper('random_int', 'initialization')
 def random_int(shape, params):

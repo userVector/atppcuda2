@@ -27,7 +27,7 @@ class GrowGrass(SubstepTransition):
 
     # reduce all countdowns by 1 unit of time.
     growth_countdown_mask = torch.full(growth_countdown.shape, -1)
-    growth_countdown = growth_countdown + growth_countdown_mask
+    growth_countdown = growth_countdown.to('cuda') + growth_countdown_mask.to('cuda')
 
     # if the countdown has reached zero, set the growth stage to 1,
     # otherwise, keep it zero.
